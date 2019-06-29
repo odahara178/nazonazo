@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>nazonazo</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <style>
+  [v-cloak] {
+    display: none;
+  }
+  </style>
+</head>
+
+<body>
+  <div class="container pt-4">
+    <div class="card p-3 text-center">
+        <div id="app" v-cloak>
+          <p>{{ problems[question_spot].content }}</p>
+            <input class="form-control" v-model="answer">
+            <button class="btn btn-primary btn-lg btn-block my-2" v-on:click="checkAnswer()" v-if="!next">答える</button>
+            <button class="btn btn-primary btn-lg btn-block my-2" v-on:click="onClickNext" v-else>次へ</button>
+            <p>{{ result }}</p>
+        </div>
+      </div>
+  </div>
+
+  <!-- vue.js -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+  <!-- lodash.min.js -->
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.5/lodash.min.js"></script>
+  <!-- axios.min.js -->
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    var app = new Vue({
+      el: "#app",
+      data: {
+        problems: [
+          {
+            "content":"",
+            "correct": ""
+          },
+        ],
+        question_spot: 0,
+        answer: "",
+        result: "",
+        next: false,
+      },
+      mounted: function () {
+        axios.get("./asset/nazonazo.json").then(response => (this.problems = response.data))
+      },
+      methods: {
+        checkAnswer: function() {
+          if(this.answer == this.problems[this.question_spot].correct) {
+            this.result = "正解です";
+            this.next = true;
+          }else {
+            this.result = "不正解です";
+          }
+        },
+        onClickNext: function() {
+          this.question_spot =  Math.floor( Math.random() * (this.problems.length - 1) );
+          this.result = "";
+          this.next = false;
+          this.answer = "";
+        }
+      }
+    });
+  </script>
+</body>
+</html>
